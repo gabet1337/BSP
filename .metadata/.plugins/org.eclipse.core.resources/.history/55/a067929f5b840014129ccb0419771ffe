@@ -1,0 +1,16 @@
+package cg;
+
+import java.awt.Color;
+
+public class LineSegment {
+
+	int id;
+	Point p,q;
+	Color color;
+	
+	public LineSegment(int id, Point p, Point q) {
+		this.p = p;
+		this.q = q;
+	}
+	
+}

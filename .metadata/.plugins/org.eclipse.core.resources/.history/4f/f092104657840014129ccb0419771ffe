@@ -1,0 +1,56 @@
+package cg;
+import java.util.*;
+import javax.swing.SwingUtilities;
+public class InputParser {
+
+	
+	public static void main(String[] args) {
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ViewPort vp = new ViewPort();
+				vp.setVisible(true);
+			}
+		});
+		System.out.println("enter a command");
+		Scanner in = new Scanner(System.in);
+		String command = in.next();
+		double x1,x2,y1,y2;
+		int id, colorCode;
+		switch (command) {
+		case "draw-line":
+			x1 = in.nextDouble();
+			y1 = in.nextDouble();
+			x2 = in.nextDouble();
+			y2 = in.nextDouble();
+			break;
+		case "edit":
+			id = in.nextInt();
+			x1 = in.nextDouble();
+			y1 = in.nextDouble();
+			x2 = in.nextDouble();
+			y2 = in.nextDouble();
+			break;
+		case "color":
+			id = in.nextInt();
+			colorCode = in.nextInt();
+			break;
+		case "draw-point":
+			x1 = in.nextDouble();
+			y1 = in.nextDouble();
+			break;
+		case "delete":
+			id = in.nextInt();
+			break;
+		case "write-lines":
+			break;
+		case "write-points":
+			break;
+		default:
+			break;
+		}
+		in.close();
+			
+	}
+	
+}

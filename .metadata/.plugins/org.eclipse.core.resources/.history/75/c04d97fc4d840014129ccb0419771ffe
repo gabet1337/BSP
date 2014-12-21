@@ -1,0 +1,10 @@
+package cg;
+import java.util.*;
+public class InputParser {
+
+	
+	public static void main(String[] args) {
+		
+	}
+	
+}

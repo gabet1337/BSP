@@ -1,0 +1,36 @@
+package cg;
+
+public interface DrawingActions {
+	
+	/**
+	 * Draws a line segment from (x1,y1) to (x2,y2)
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return id of the newly drawn line segment
+	 */
+	public int DrawLineSegment(double x1, double y1, double x2, double y2);
+	
+	/**
+	 * Edits the line segment with the given id to the newly given points
+	 * @param id
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return true if line segment was successfully edited, otherwise false
+	 */
+	public boolean EditLineSegment(int id, double x1, double y1, double x2, double y2);
+	
+	public boolean ColorLineSegment(int id, int colorCode);
+	
+	public int DrawPoint(double x, double y);
+	
+	/**
+	 * @param id
+	 * @return
+	 */
+	public boolean DeleteObjectWithID(int id);
+	
+}

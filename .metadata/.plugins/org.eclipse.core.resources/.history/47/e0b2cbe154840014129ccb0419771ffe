@@ -1,0 +1,11 @@
+package cg;
+import java.util.*;
+public class InputParser {
+
+	
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
+		String command;
+	}
+	
+}

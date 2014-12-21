@@ -1,0 +1,14 @@
+package cg;
+
+public interface DrawingActions {
+	
+	/**
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @return id of the newly drawn linesegment
+	 */
+	public int DrawLineSegment(double x1, double y1, double x2, double y2);
+	
+}

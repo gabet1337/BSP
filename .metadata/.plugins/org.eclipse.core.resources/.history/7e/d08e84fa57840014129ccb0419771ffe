@@ -1,0 +1,135 @@
+package cg;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.*;
+
+import javax.swing.*;
+
+public class ViewPort extends JFrame {
+	
+	public ViewPort() {
+		setTitle("Binary Space Partition");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ViewPanel vp = new ViewPanel();
+		add(vp);
+		setSize(500,500);
+		setLocationRelativeTo(null);
+		
+		System.out.println("enter a command");
+		Scanner in = new Scanner(System.in);
+		String command = in.next();
+		double x1,x2,y1,y2;
+		int id, colorCode;
+		switch (command) {
+		case "draw-line":
+			System.out.println("Enter the points for this line");
+			x1 = in.nextDouble();
+			y1 = in.nextDouble();
+			x2 = in.nextDouble();
+			y2 = in.nextDouble();
+			
+			break;
+		case "edit":
+			id = in.nextInt();
+			x1 = in.nextDouble();
+			y1 = in.nextDouble();
+			x2 = in.nextDouble();
+			y2 = in.nextDouble();
+			break;
+		case "color":
+			id = in.nextInt();
+			colorCode = in.nextInt();
+			break;
+		case "draw-point":
+			x1 = in.nextDouble();
+			y1 = in.nextDouble();
+			break;
+		case "delete":
+			id = in.nextInt();
+			break;
+		case "write-lines":
+			break;
+		case "write-points":
+			break;
+		default:
+			break;
+		}
+		in.close();
+	}
+
+}
+
+class ViewPanel extends JPanel implements DrawingActions {
+	
+	private List<LineSegment> lineSegments = new LinkedList<LineSegment>();
+	private List<Point> points = new LinkedList<Point>();
+	private int nextId = 0;
+	
+	public ViewPanel() {
+	}
+	
+	private void redraw(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setColor(Color.white);
+
+		for (LineSegment segment : lineSegments) {
+			g2d.drawLine(segment.p.x, segment.p.y, segment.q.x, segment.q.y);
+		}
+		
+		for (Point point : points) {
+			g2d.drawLine(point.x, point.y, point.x, point.y);
+		}
+	}
+	
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		redraw(g);
+	}
+
+	@Override
+	public int DrawLineSegment(int x1, int y1, int x2, int y2) {
+		Point p = new Point(x1,y1);
+		Point q = new Point(x2,y2);
+		int id = nextId++;
+		lineSegments.add(new LineSegment(id, p,q));
+		repaint();
+		return id;
+	}
+
+	@Override
+	public boolean EditLineSegment(int id, int x1, int y1, int x2, int y2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean ColorLineSegment(int id, int colorCode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int DrawPoint(int x, int y) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean DeleteObjectWithID(int id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void WriteAllLineSegments() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void WriteAllPoints() {
+		// TODO Auto-generated method stub
+		
+	}
+}

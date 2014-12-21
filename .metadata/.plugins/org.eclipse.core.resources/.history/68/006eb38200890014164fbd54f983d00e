@@ -1,0 +1,104 @@
+package cg;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.*;
+
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+class ViewPanel extends JComponent implements DrawingActions {
+	
+	private List<LineSegment> lineSegments = new LinkedList<LineSegment>();
+	private List<Point> points = new LinkedList<Point>();
+	private int nextId = 0;
+	
+	private void redraw(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setColor(Color.BLACK);
+		for (LineSegment segment : lineSegments) {
+			g2d.setColor(segment.color);
+			g2d.drawLine(segment.p.x, segment.p.y, segment.q.x, segment.q.y);
+		}
+		
+		for (Point point : points) {
+			g2d.drawLine(point.x, point.y, point.x, point.y);
+		}
+	}
+	
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		redraw(g);
+	}
+
+	@Override
+	public int DrawLineSegment(int x1, int y1, int x2, int y2) {
+		Point p = new Point(x1,y1);
+		Point q = new Point(x2,y2);
+		int id = nextId++;
+		LineSegment segment = new LineSegment(id, p,q, Color.BLACK);
+		lineSegments.add(segment);
+		return id;
+	}
+
+	@Override
+	public boolean EditLineSegment(int id, int x1, int y1, int x2, int y2) {
+		LineSegment result = null;
+		for (LineSegment segment : lineSegments) {
+			if (segment.id == id) {result = segment; break;}
+		}
+		if (result == null) return false;
+		result.p.x = x1;
+		result.p.y = y1;
+		result.q.x = x2;
+		result.q.y = y2;
+		return true;
+	}
+
+	@Override
+	public boolean ColorLineSegment(int id, int colorCode) {
+		LineSegment result = null;
+		for (LineSegment segment : lineSegments) {
+			if (segment.id == id) {result = segment; break;}
+		}
+		if (result == null) return false;
+		result.color = new Color(colorCode);
+		return true;
+	}
+
+	@Override
+	public int DrawPoint(int x, int y) {
+		int id = nextId++;
+		Point p = new Point(id, x, y);
+		points.add(p);
+		return id;
+	}
+
+	@Override
+	public boolean DeleteObjectWithID(int id) {
+		boolean ret = lineSegments.removeIf(s -> s.id == id);
+		boolean ret2 = points.removeIf(p -> p.id == id);
+		return ret || ret2;
+	}
+
+	@Override
+	public void WriteAllLineSegments() {
+		for (LineSegment segment : lineSegments) {
+			System.out.println(segment.toString());
+		}
+	}
+
+	@Override
+	public void WriteAllPoints() {
+		for (Point point : points) {
+			System.out.println(point.toString());
+		}
+	}
+	
+	public void ConstructBSP() {
+		ArrayList<Segment> segments = new ArrayList<Segment>();
+		for (LineSegment s : lineSegments) {
+			segments.add(new Segment(s.id, s.p.x1, s.p.y1, s.q.x2, s.q.y2))
+		}
+	}
+}

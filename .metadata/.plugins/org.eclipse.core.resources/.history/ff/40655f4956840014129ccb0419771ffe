@@ -1,0 +1,12 @@
+package cg;
+
+public class LineSegment {
+
+	Point p,q;
+	
+	public LineSegment(Point p, Point q) {
+		this.p = p;
+		this.q = q;
+	}
+	
+}

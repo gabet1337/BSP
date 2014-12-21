@@ -1,0 +1,81 @@
+package cg;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.util.*;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+public class InputParser {
+
+	
+	public static void main(String[] args) {
+		
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ViewPanel vp = new ViewPanel();
+		vp.setPreferredSize(new Dimension(500,500));
+		frame.getContentPane().add(vp, BorderLayout.CENTER);
+		frame.setBackground(Color.WHITE);
+		frame.pack();
+		frame.setVisible(true);
+		
+		Scanner in = new Scanner(System.in);
+		while (true) {
+			System.out.println("enter a command");
+			String command = in.next();
+			int x1, x2, y1, y2;
+			int id, colorCode;
+			switch (command) {
+			case "draw-line":
+				System.out.println("Enter the points for this line");
+				x1 = in.nextInt();
+				y1 = in.nextInt();
+				x2 = in.nextInt();
+				y2 = in.nextInt();
+				id = vp.DrawLineSegment(x1, y1, x2, y2);
+				vp.revalidate();
+				vp.repaint();
+				System.out.println(id);
+				break;
+			case "edit":
+				id = in.nextInt();
+				x1 = in.nextInt();
+				y1 = in.nextInt();
+				x2 = in.nextInt();
+				y2 = in.nextInt();
+				break;
+			case "color":
+				id = in.nextInt();
+				colorCode = in.nextInt();
+				System.out.println(vp.ColorLineSegment(0, colorCode));
+				vp.revalidate();
+				vp.repaint();
+				break;
+			case "draw-point":
+				x1 = in.nextInt();
+				y1 = in.nextInt();
+				id = vp.DrawPoint(x1, y1);
+				System.out.println(id);
+				vp.revalidate();
+				vp.repaint();
+				break;
+			case "delete":
+				id = in.nextInt();
+				boolean ret = vp.DeleteObjectWithID(id);
+				System.out.println(ret);
+				vp.revalidate();
+				vp.repaint();
+				break;
+			case "write-lines":
+				break;
+			case "write-points":
+				break;
+			default:
+				break;
+			}
+		}
+			
+	}
+	
+}

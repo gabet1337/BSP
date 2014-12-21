@@ -1,0 +1,14 @@
+draw-line 340 468 500 500
+draw-line 500 500 378 229
+draw-line 378 229 500 0
+draw-line 500 0 416 17
+draw-line 416 17 336 3
+draw-line 336 3 266 109
+draw-line 266 109 192 33
+draw-line 192 33 0 0
+draw-line 0 0 0 65
+draw-line 0 65 26 265
+draw-line 26 265 192 260
+draw-line 192 260 23 340
+draw-line 23 340 0 500
+draw-line 0 500 340 468
