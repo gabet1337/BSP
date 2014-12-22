@@ -77,7 +77,7 @@ public class BSP {
 			ArrayList<Segment> S_contained = new ArrayList<Segment>();
 			Segment s0 = S.get(0);
 			S_contained.add(s0);
-			double x1 = s0.x1, y1 = s0.y1, x2 = s0.x2, y2 = s0.x2;
+			double x1 = s0.x1, y1 = s0.y1, x2 = s0.x2, y2 = s0.y2;
 			for (int i = 1; i < S.size(); i++) {
 				double x3 = S.get(i).x1, y3 = S.get(i).y1, x4 = S.get(i).x2, y4 = S.get(i).y2;
 				
