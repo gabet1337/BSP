@@ -28,7 +28,10 @@ class ViewPanel extends JComponent implements DrawingActions {
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		redraw(g);
+		Graphics2D g2d = (Graphics2D)g;
+		g2d.translate(0, getHeight() - 1);
+		g2d.scale(1, -1);
+		redraw(g2d);
 	}
 
 	@Override

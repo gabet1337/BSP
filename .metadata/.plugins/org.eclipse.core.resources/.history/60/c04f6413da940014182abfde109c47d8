@@ -1,0 +1,357 @@
+package cg;
+import java.util.*;
+class Segment {
+	int id;
+	double x1,x2,y1,y2;
+	public Segment(int id, double x1, double y1, double x2, double y2) {
+		this.id = id; this.x1 = x1;	this.y1 = y1; this.x2 = x2; this.y2 = y2;
+	}
+	public String toString() {
+		return id + " (" + x1 + ", " + y1 + "), (" + x2 + ", " + y2 + ")";
+	}
+}
+
+class Node {
+	int id;
+	ArrayList<Segment> segments;
+	Node left;
+	Node right;
+	void visit() {
+		System.out.println("====== ID: " + id + " ======");
+		if (left == null) System.out.println("left: null");
+		else System.out.println("left: " + left.id);
+		if (right == null) System.out.println("right: null");
+		else System.out.println("right: " + right.id);
+		for (Segment s : segments)
+			System.out.println(s);
+		System.out.println("=====================");
+	}
+}
+
+//class Interval {
+//	double start,end;
+//	Segment segment;
+//}
+
+public class BSP {
+
+	public void PreOrderTreeWalk(Node n) {
+		if (n == null) return;
+		n.visit();
+		PreOrderTreeWalk(n.left);
+		PreOrderTreeWalk(n.right);
+	}
+	
+	public void InOrderTreeWalk(Node n) {
+		if (n == null) return;
+		InOrderTreeWalk(n.left);
+		n.visit();
+		InOrderTreeWalk(n.right);
+	}
+	
+	public void PostOrderTreeWalk(Node n) {
+		if (n == null) return;
+		PostOrderTreeWalk(n.left);
+		PostOrderTreeWalk(n.right);
+		n.visit();
+	}
+	
+	public List<Interval1D> GetVisibleSegments(double x, double y) { 
+		ArrayList<Interval1D> result = new ArrayList<Interval1D>();
+		IntervalST<Interval1D> tree = new IntervalST<Interval1D>();
+		for (Segment s : paintersResult) {
+			for (Interval1D interval : Angles.ComputeInterval(s.x1, s.y1, s.x2, s.y2, x, y)) {
+
+				// find all intervals that intersect this
+				// if none intersects. add the interval to the tree
+				// if they overlap: modify the existing
+
+				for (Interval1D overlap : tree.searchAll(interval)) {
+					if (overlap.low <= interval.high && interval.high <= overlap.high 
+							&& overlap.low <= interval.low && interval.low <= overlap.high)
+					{
+						//case 1: interval is contained in overlap
+						tree.remove(overlap);
+						Interval1D newInt = new Interval1D(overlap.low, interval.low, overlap.id);
+						Interval1D newInt2 = new Interval1D(interval.high, overlap.high, overlap.id);
+						tree.put(newInt,null);
+						tree.put(newInt2,null);
+					}
+					else if (overlap.low <= interval.high && interval.high <= overlap.high) {
+						//case 2 : end point of interval is in between start of overlap and end of overlap
+						tree.remove(overlap);
+						Interval1D newInt = new Interval1D(interval.high, overlap.high, overlap.id);
+						tree.put(newInt, null);
+					} 
+					else if (overlap.low <= interval.low && interval.low <= overlap.high) {
+						// case 3: start point of interval is in between start of overlap and end of overlap 
+						tree.remove(overlap);
+						Interval1D newInt = new Interval1D(overlap.low, interval.low, overlap.id);
+						tree.put(newInt, null);
+					} else if (interval.low <= overlap.low && interval.high >= overlap.high) {
+						// case 4: overlap is contained in the interval.
+						tree.remove(overlap);
+					}
+
+					interval.id = s.id;
+					tree.put(interval, null);
+				}
+			}
+		}
+		
+		for (Interval1D i : tree.searchAll(new Interval1D(0,1000,-1)));
+
+		return result;
+	}
+	
+	public static final int NODE_SIZE = 1;
+	public static final double EPS = 1e-9;
+	int nextID = 0;
+	private Node ConstructBSP2(ArrayList<Segment> S) {
+		int cardinality = S.size();
+		if (cardinality == 0) return null;
+		if (cardinality <= NODE_SIZE) {
+			Node n = new Node();
+			n.left = null;
+			n.right = null;
+			n.segments = S;
+			n.id = nextID++;
+			return n;
+		} else {
+			//TODO: If the segment intersects the splitting line then it should be split and one should be added to each side
+			//TODO: Find the intersection between the splitting line and the segment. Split the segment in this point
+			// and add one segment to S_plus and the other to S_minus
+			ArrayList<Segment> S_plus = new ArrayList<Segment>();
+			ArrayList<Segment> S_minus = new ArrayList<Segment>();
+			ArrayList<Segment> S_contained = new ArrayList<Segment>();
+			Segment s0 = S.get(0);
+			S_contained.add(s0);
+			double x1 = s0.x1, y1 = s0.y1, x2 = s0.x2, y2 = s0.y2;
+			for (int i = 1; i < S.size(); i++) {
+				double x3 = S.get(i).x1, y3 = S.get(i).y1, x4 = S.get(i).x2, y4 = S.get(i).y2;
+				
+				boolean isRight = false, isLeft = false, isContained = false;
+				if ( (x2-x1)*(y3-y1) - (y2-y1)*(x3-x1) > 0 || (x2-x1)*(y4-y1) - (y2-y1)*(x4-x1) > 0 ) {
+					//right
+					isRight = true;
+					//S_plus.add(S.get(i));
+				} 
+				if ( (x2-x1)*(y3-y1) - (y2-y1)*(x3-x1) < 0 || (x2-x1)*(y4-y1) - (y2-y1)*(x4-x1) < 0 ) {
+					//left
+					isLeft = true;
+					//S_minus.add(S.get(i));
+				}
+				if ( Math.abs((x2-x1)*(y3-y1) - (y2-y1)*(x3-x1)) < EPS && Math.abs((x2-x1)*(y4-y1) - (y2-y1)*(x4-x1)) < EPS ) {
+					isContained = true;
+					//S_contained.add(S.get(i));
+				}
+				
+				if (isRight && isLeft) {
+					//find intersection and split
+					double Px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+					double Py = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+					if ((x2-x1)*(y3-y1) - (y2-y1)*(x3-x1) < 0) {
+						//x3,y3 is to the left of line
+						S_minus.add(new Segment(nextID++, x3,y3, Px,Py));
+						S_plus.add(new Segment(nextID++, Px,Py,x4,y4));
+					} else {
+						S_minus.add(new Segment(nextID++, Px,Py, x4,y4));
+						S_plus.add(new Segment(nextID++, x3,y3,Px,Py));
+
+					}
+				} else if (isLeft) {
+					S_minus.add(S.get(i));
+				} else if (isRight) {
+					S_plus.add(S.get(i));
+				} else if (isContained) {
+					S_contained.add(S.get(i));
+				}
+				
+			}
+
+			Node T_plus = ConstructBSP2(S_plus);
+			Node T_minus = ConstructBSP2(S_minus);
+			
+			Node v = new Node();
+			v.left = T_minus;
+			v.right = T_plus;
+			v.id = nextID++;
+			v.segments = S_contained;
+			return v;
+		}
+	}
+	
+	public Node ConstructBSP(ArrayList<Segment> segments) {
+		//Collections.shuffle(segments);
+		nextID = segments.size();
+		return ConstructBSP2(segments);
+	}
+	
+	private void ScanConvert(Node v) {
+		for (Segment s : v.segments) {
+			paintersResult.add(s);
+		}
+	}
+	ArrayList<Segment> paintersResult = new ArrayList<Segment>();
+	public void PaintersAlgorithm(Node v, int x, int y) {
+		if (v == null) return;
+		if (v.left == null && v.right == null) {
+			//scan convert S(v)
+			ScanConvert(v);
+			return;
+		}
+		Segment s0 = v.segments.get(0);
+		double Ax = s0.x1, Ay = s0.y1, Bx = s0.x2, By = s0.y2;
+		if ( (Bx-Ax)*(y-Ay) - (By-Ay)*(x-Ax) > 0 ) {
+			// point is right of line
+			PaintersAlgorithm(v.left, x, y);
+			ScanConvert(v);
+			PaintersAlgorithm(v.right, x, y);
+		} 
+		else if ( (Bx-Ax)*(y-Ay) - (By-Ay)*(x-Ax) < 0 ) {
+			//left
+			PaintersAlgorithm(v.right, x, y);
+			ScanConvert(v);
+			PaintersAlgorithm(v.left, x, y);
+		} else {
+			//the point is on the line - doesn't matter
+			PaintersAlgorithm(v.right, x, y);
+			PaintersAlgorithm(v.left, x, y);
+		}
+	}
+//	ArrayList<Interval> viewPort = new ArrayList<Interval>();
+//	
+//	
+//	private boolean IntervalIntersects(Interval i, Interval q) {
+//		if (i.start < i.end) {
+//			if (i.start < q.start && q.start < i.end) return true; // q.start is in the interval
+//			if (i.start < q.end && q.end < i.end) return true; // q.end is in the interval
+//		}
+//		
+//		if (i.start > i.end) {
+//			
+//		}
+//		
+//		return false;
+//	}
+//	
+//	public List<Interval> GetFreeIntervals(Interval interval) {
+//		ArrayList<Interval> result = new ArrayList<Interval>();
+//		result.add(interval);
+//		// for each interval in the viewPort check the list of possible results and remove the already used intervals
+//		for (Interval i : viewPort) {
+//			
+//		}
+//		
+//		return result;
+//	}
+	
+//	private void HandleNode(Node n, int x, int y) {
+//		for (Segment s :  n.segments) {
+//			//calculate the angles of this segment [0,2pi] and get the interval
+//			double deltaY = y - s.y1;
+//			double deltaX = x - s.x1;
+//			double angle1 = Math.atan2(deltaY, deltaX) + Math.PI;
+//			deltaY = y - s.y2;
+//			deltaX = x - s.x2;
+//			double angle2 = Math.atan2(deltaY, deltaX) + Math.PI;
+//			Interval i = new Interval();
+//			if (Math.max(angle1, angle2) - Math.min(angle1,angle2) < 2*Math.PI + Math.min(angle1, angle2) - Math.max(angle1,angle2)) {
+//				i.start = Math.min(angle1, angle2);
+//				i.end = Math.max(angle1, angle2);
+//			} else {
+//				i.start = Math.max(angle1, angle2);
+//				i.end = Math.min(angle1, angle2);
+//			}
+//			//get a list of free intervals for this interval
+//			List<Interval> freeIntervals = GetFreeIntervals(i);
+//			for (Interval free : freeIntervals) {
+//				//calculate the segments that must be associated with the free intervals and add them to the viewport
+//				//this is done by finding the intersection of the line (x,y)->(cos(start), sin(start)) with s
+//				// and the intersection of the line (x,y)->(cos(end), sin(end)) with s
+//				double x2 = Math.cos(free.start), y2 = Math.sin(free.start);
+//				double x1 = x, y1 = y;
+//				double x3 = s.x1, y3 = s.y1, x4 = s.x2, y4 = s.y2;
+//				
+//				double Px_start = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+//				double Py_start = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+//				
+//				x2 = Math.cos(free.end);
+//				y2 = Math.sin(free.end);
+//				
+//				double Px_end = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+//				double Py_end = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+//				
+//				free.segment = new Segment(nextID++, Px_start, Py_start, Px_end, Py_end);
+//				viewPort.add(free);
+//			}
+//		}
+//	}
+	
+	
+//	public void ReversePaintersAlgorithm(Node n, int x, int y) {
+//		
+//		if (n.left == null && n.right == null) {
+//			//n is a leaf and we should check if we can add intervals
+//			HandleNode(n,x,y);
+//			return;
+//		}
+//		Segment s0 = n.segments.get(0);
+//		double Ax = s0.x1, Ay = s0.y1, Bx = s0.x2, By = s0.x2;
+//		if ( (Bx-Ax)*(y-Ay) - (By-Ay)*(x-Ax) > 0 ) {
+//			// point is right of line
+//			ReversePaintersAlgorithm(n.right, x, y);
+//			ReversePaintersAlgorithm(n.left, x, y);
+//			//check if any lines contained on this splitting line
+//		} 
+//		else if ( (Bx-Ax)*(y-Ay) - (By-Ay)*(x-Ax) < 0 ) {
+//			//left
+//			ReversePaintersAlgorithm(n.left, x, y);
+//			ReversePaintersAlgorithm(n.right, x, y);
+//			//check if any lines contained in this splitting line
+//			HandleNode(n,x,y);
+//		} else {
+//			//the point is on the line - doesn't matter
+//			PaintersAlgorithm(n.right, x, y);
+//			PaintersAlgorithm(n.left, x, y);
+//			// check if other lines on this splitting line
+//			HandleNode(n,x,y);
+//		}
+//		
+//	}	
+	
+	public static void main(String[] args) {
+		BSP bsp = new BSP();
+		Scanner in = new Scanner(System.in);
+		String useless;
+		int x1,x2,y1,y2;
+		int id = 0;
+		ArrayList<Segment> segments = new ArrayList<Segment>();
+		while (in.hasNext()) {
+			useless = in.next();
+			x1 = in.nextInt();
+			y1 = in.nextInt();
+			x2 = in.nextInt();
+			y2 = in.nextInt();
+			segments.add(new Segment(id++,x1,y1,x2,y2));
+		}
+		Node root = bsp.ConstructBSP(segments);
+		bsp.PreOrderTreeWalk(root);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
