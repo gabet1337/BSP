@@ -184,7 +184,7 @@ public class BSP {
 	}
 	
 	public Node ConstructBSP(ArrayList<Segment> segments) {
-		Collections.shuffle(segments);
+		//Collections.shuffle(segments);
 		nextID = segments.size();
 		return ConstructBSP2(segments);
 	}

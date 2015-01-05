@@ -128,7 +128,7 @@ public class InputParser {
 
 					id = vp.DrawLineSegment((int)Px1, (int)Py1, (int)Px2, (int)Py2);
 					vp.ColorLineSegment(id, 16711680);
-					vp.repaint();
+					
 				}
 				break;
 			case "visibility":

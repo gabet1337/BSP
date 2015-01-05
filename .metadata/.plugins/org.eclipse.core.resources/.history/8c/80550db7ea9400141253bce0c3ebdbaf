@@ -1,5 +1,4 @@
 package cg;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -19,7 +18,6 @@ class ViewPanel extends JComponent implements DrawingActions {
 		g2d.setColor(Color.BLACK);
 		for (LineSegment segment : lineSegments) {
 			g2d.setColor(segment.color);
-			g2d.setStroke(new BasicStroke(5));
 			g2d.drawLine(segment.p.x, segment.p.y, segment.q.x, segment.q.y);
 		}
 		
